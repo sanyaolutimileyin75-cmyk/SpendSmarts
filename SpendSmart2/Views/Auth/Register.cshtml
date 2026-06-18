@@ -1,0 +1,76 @@
+﻿@model SpendSmart2.Models.RegisterViewModel
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Register";
+}
+
+<div class="auth-card">
+    <div class="auth-logo">
+        <h1>Spend<span>Smart</span></h1>
+        <p>Create your free account today</p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in ViewData.ModelState.Values
+            .SelectMany(v => v.Errors))
+            {
+                <div><i class="fas fa-exclamation-circle me-2"></i>@error.ErrorMessage</div>
+            }
+        </div>
+    }
+
+    <form asp-action="Register" asp-controller="Auth" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">
+                <i class="fas fa-user me-2"></i>Full Name
+            </label>
+            <input asp-for="FullName"
+                   class="form-control"
+                   placeholder="Enter your full name" />
+            <span asp-validation-for="FullName" class="text-danger" style="font-size:12px"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <i class="fas fa-envelope me-2"></i>Email Address
+            </label>
+            <input asp-for="Email"
+                   class="form-control"
+                   placeholder="Enter your email" />
+            <span asp-validation-for="Email" class="text-danger" style="font-size:12px"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <i class="fas fa-lock me-2"></i>Password
+            </label>
+            <input asp-for="Password"
+                   class="form-control"
+                   placeholder="Min 6 characters" />
+            <span asp-validation-for="Password" class="text-danger" style="font-size:12px"></span>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">
+                <i class="fas fa-lock me-2"></i>Confirm Password
+            </label>
+            <input asp-for="ConfirmPassword"
+                   class="form-control"
+                   placeholder="Repeat your password" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger" style="font-size:12px"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Create Account
+        </button>
+    </form>
+
+    <div class="auth-link">
+        Already have an account?
+        <a href="/Auth/Login">Sign In</a>
+    </div>
+</div>

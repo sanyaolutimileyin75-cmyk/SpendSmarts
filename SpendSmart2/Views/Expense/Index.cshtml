@@ -1,0 +1,181 @@
+﻿@model IEnumerable<SpendSmart2.Models.Expense>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Expenses";
+}
+
+<!-- Search & Filter Bar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="Index" asp-controller="Expense">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+                    <label class="form-label fw-600" style="font-size:13px">
+                        <i class="fas fa-search me-1" style="color:#4cc9f0"></i>
+                        Search
+                    </label>
+                    <input type="text"
+                           name="search"
+                           value="@ViewBag.Search"
+                           class="form-control"
+                           placeholder="Search expenses..." />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-600" style="font-size:13px">
+                        <i class="fas fa-filter me-1" style="color:#4cc9f0"></i>
+                        Category
+                    </label>
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="Food & Dining" selected="@(ViewBag.Category == "Food & Dining")">🍔 Food & Dining</option>
+                        <option value="Transport" selected="@(ViewBag.Category == "Transport")">🚗 Transport</option>
+                        <option value="Shopping" selected="@(ViewBag.Category == "Shopping")">🛍️ Shopping</option>
+                        <option value="Entertainment" selected="@(ViewBag.Category == "Entertainment")">🎮 Entertainment</option>
+                        <option value="Health" selected="@(ViewBag.Category == "Health")">💊 Health</option>
+                        <option value="Education" selected="@(ViewBag.Category == "Education")">📚 Education</option>
+                        <option value="Bills & Utilities" selected="@(ViewBag.Category == "Bills & Utilities")">💡 Bills & Utilities</option>
+                        <option value="Housing" selected="@(ViewBag.Category == "Housing")">🏠 Housing</option>
+                        <option value="Other" selected="@(ViewBag.Category == "Other")">📦 Other</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-600" style="font-size:13px">
+                        <i class="fas fa-sort me-1" style="color:#4cc9f0"></i>
+                        Sort By
+                    </label>
+                    <select name="sort" class="form-select">
+                        <option value="">Latest First</option>
+                        <option value="date_asc">Oldest First</option>
+                        <option value="amount_desc">Highest Amount</option>
+                        <option value="amount_asc">Lowest Amount</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <a href="/Expense/Index" class="btn btn-secondary w-100"
+                       style="border-radius:10px">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Expenses Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>
+            <i class="fas fa-wallet me-2" style="color:#4cc9f0"></i>
+            All Expenses
+            <span class="badge ms-2"
+                  style="background:rgba(76,201,240,0.15);
+                         color:#4cc9f0;
+                         font-size:12px;
+                         border-radius:20px;
+                         padding: 4px 10px">
+                @Model.Count() records
+            </span>
+        </h5>
+        <a href="/Expense/Create" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i>Add New
+        </a>
+    </div>
+
+    <div class="card-body p-0">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int count = 1; }
+                        @foreach (var expense in Model)
+                        {
+                            <tr>
+                                <td style="color:#999">@count</td>
+                                <td><strong>@expense.Name</strong></td>
+                                <td>
+                                    <span class="badge-category"
+                                          style="background:rgba(76,201,240,0.15);
+                                                 color:#4cc9f0">
+                                        @expense.Category
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="color:#4361ee">
+                                        ₦@string.Format("{0:N2}", expense.Amount)
+                                    </strong>
+                                </td>
+                                <td style="color:#999">
+                                    @expense.Date.ToString("MMM dd, yyyy")
+                                </td>
+                                <td>
+                                    <a href="/Expense/Edit/@expense.Id"
+                                       class="btn btn-action me-1"
+                                       style="background:rgba(76,201,240,0.15);
+                                              color:#4cc9f0">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="Delete"
+                                          asp-route-id="@expense.Id"
+                                          method="post"
+                                          style="display:inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this expense?')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit"
+                                                class="btn btn-action"
+                                                style="background:rgba(255,0,0,0.1);
+                                                       color:#ff6b6b">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            count++;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr style="background:#f9f9f9">
+                            <td colspan="3" class="text-end pe-3">
+                                <strong>Filtered Total:</strong>
+                            </td>
+                            <td>
+                                <strong style="color:#4361ee; font-size:16px">
+                                    ₦@string.Format("{0:N2}", ViewBag.TotalFiltered)
+                                </strong>
+                            </td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x mb-3" style="color:#ddd"></i>
+                <p style="color:#999">No expenses found matching your search.</p>
+                <a href="/Expense/Index" class="btn btn-primary">
+                    <i class="fas fa-times me-2"></i>Clear Filters
+                </a>
+            </div>
+        }
+    </div>
+</div>

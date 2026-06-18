@@ -1,0 +1,299 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- ===== STATS CARDS ===== -->
+<div class="row g-4 mb-4">
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="stat-label">Total Expenses</p>
+                    <h3 class="stat-value">
+                        ₦@string.Format("{0:N2}", ViewBag.TotalExpenses)
+                    </h3>
+                    <span class="stat-sub">All time spending</span>
+                </div>
+                <div class="stat-icon" style="background:rgba(76,201,240,0.15)">
+                    <i class="fas fa-wallet" style="color:#4cc9f0"></i>
+                </div> 
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="stat-label">This Month</p>
+                    <h3 class="stat-value">
+                        ₦@string.Format("{0:N2}", ViewBag.ThisMonthTotal)
+                    </h3>
+                    <span class="stat-sub">@DateTime.Now.ToString("MMMM yyyy")</span>
+                </div>
+                <div class="stat-icon" style="background:rgba(67,97,238,0.15)">
+                    <i class="fas fa-calendar-alt" style="color:#4361ee"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="stat-label">Transactions</p>
+                    <h3 class="stat-value">@ViewBag.ExpenseCount</h3>
+                    <span class="stat-sub">Total records</span>
+                </div>
+                <div class="stat-icon" style="background:rgba(76,201,240,0.15)">
+                    <i class="fas fa-receipt" style="color:#4cc9f0"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="stat-label">Highest Expense</p>
+                    <h3 class="stat-value">
+                        ₦@string.Format("{0:N2}", ViewBag.HighestExpense)
+                    </h3>
+                    <span class="stat-sub">Single transaction</span>
+                </div>
+                <div class="stat-icon" style="background:rgba(255,107,107,0.15)">
+                    <i class="fas fa-arrow-up" style="color:#ff6b6b"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== CHARTS ROW ===== -->
+<div class="row g-4 mb-4">
+
+    <!-- Monthly Chart -->
+    <div class="col-lg-8">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-chart-bar me-2" style="color:#4cc9f0"></i>
+                    Monthly Spending (Last 6 Months)
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Chart -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-chart-pie me-2" style="color:#4361ee"></i>
+                    By Category
+                </h5>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <canvas id="categoryChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== RECENT EXPENSES ===== -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>
+            <i class="fas fa-clock me-2" style="color:#4cc9f0"></i>
+            Recent Expenses
+        </h5>
+        <a href="/Expense/Create" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i>Add New
+        </a>
+    </div>
+    <div class="card-body p-0">
+        @if (ViewBag.RecentExpenses != null && ViewBag.RecentExpenses.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var expense in ViewBag.RecentExpenses)
+                        {
+                            <tr>
+                                <td><strong>@expense.Name</strong></td>
+                                <td>
+                                    <span class="badge-category"
+                                          style="background:rgba(76,201,240,0.15);
+                                                 color:#4cc9f0">
+                                        @expense.Category
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="color:#4361ee">
+                                        ₦@string.Format("{0:N2}", expense.Amount)
+                                    </strong>
+                                </td>
+                                <td style="color:#999">
+                                    @expense.Date.ToString("MMM dd, yyyy")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x mb-3" style="color:#ddd"></i>
+                <p style="color:#999">No expenses yet. Start by adding one!</p>
+                <a href="/Expense/Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add First Expense
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- ===== EXTRA STYLES ===== -->
+<style>
+    .stat-card {
+        background: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .stat-label {
+        color: #999;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 0;
+    }
+
+    .stat-sub {
+        color: #bbb;
+        font-size: 11px;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+</style>
+
+<!-- ===== CHART.JS ===== -->
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ===== MONTHLY BAR CHART =====
+        const monthLabels = @Html.Raw(ViewBag.MonthLabels);
+        const monthlyTotals = @Html.Raw(ViewBag.MonthlyTotals);
+
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Total Spending (₦)',
+                    data: monthlyTotals,
+                    backgroundColor: 'rgba(76, 201, 240, 0.2)',
+                    borderColor: '#4cc9f0',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: {
+                            callback: function(value) {
+                                return '₦' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // ===== CATEGORY DOUGHNUT CHART =====
+        const categoryLabels = @Html.Raw(ViewBag.CategoryLabels);
+        const categoryTotals = @Html.Raw(ViewBag.CategoryTotals);
+
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryTotals,
+                    backgroundColor: [
+                        '#4cc9f0', '#4361ee', '#3a0ca3',
+                        '#7209b7', '#f72585', '#ff6b6b',
+                        '#ffd166', '#06d6a0', '#118ab2'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
