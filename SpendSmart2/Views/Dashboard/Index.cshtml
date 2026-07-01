@@ -1,4 +1,6 @@
-﻿@{
+﻿@using SpendSmart2.Models.Helpers
+
+@{
     Layout = "_Layout";
     ViewData["Title"] = "Dashboard";
 }
@@ -6,13 +8,13 @@
 <!-- ===== STATS CARDS ===== -->
 <div class="row g-4 mb-4">
 
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
-            <div class="d-flex justify-content-between align-items-start">
+    <div class="col-xl-3 col-md-6 d-flex">
+        <div class="stat-card w-100">
+            <div class="d-flex justify-content-between align-items-center h-100">
                 <div>
                     <p class="stat-label">Total Expenses</p>
                     <h3 class="stat-value">
-                        ₦@string.Format("{0:N2}", ViewBag.TotalExpenses)
+                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.TotalExpenses)
                     </h3>
                     <span class="stat-sub">All time spending</span>
                 </div>
@@ -23,13 +25,13 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
-            <div class="d-flex justify-content-between align-items-start">
+    <div class="col-xl-3 col-md-6 d-flex">
+        <div class="stat-card w-100">
+            <div class="d-flex justify-content-between align-items-center h-100">
                 <div>
                     <p class="stat-label">This Month</p>
                     <h3 class="stat-value">
-                        ₦@string.Format("{0:N2}", ViewBag.ThisMonthTotal)
+                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.ThisMonthTotal)
                     </h3>
                     <span class="stat-sub">@DateTime.Now.ToString("MMMM yyyy")</span>
                 </div>
@@ -40,9 +42,9 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
-            <div class="d-flex justify-content-between align-items-start">
+    <div class="col-xl-3 col-md-6 d-flex">
+        <div class="stat-card w-100">
+            <div class="d-flex justify-content-between align-items-center h-100">
                 <div>
                     <p class="stat-label">Transactions</p>
                     <h3 class="stat-value">@ViewBag.ExpenseCount</h3>
@@ -55,13 +57,13 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
-            <div class="d-flex justify-content-between align-items-start">
+    <div class="col-xl-3 col-md-6 d-flex">
+        <div class="stat-card w-100">
+            <div class="d-flex justify-content-between align-items-center h-100">
                 <div>
                     <p class="stat-label">Highest Expense</p>
                     <h3 class="stat-value">
-                        ₦@string.Format("{0:N2}", ViewBag.HighestExpense)
+                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.HighestExpense)
                     </h3>
                     <span class="stat-sub">Single transaction</span>
                 </div>
@@ -178,8 +180,11 @@
         background: #fff;
         border-radius: 15px;
         padding: 25px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        transition: transform 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,.08);
+        transition: .3s ease;
+        min-height: 170px;
+        display: flex;
+        align-items: center;
     }
 
     .stat-card:hover {
@@ -196,26 +201,36 @@
     }
 
     .stat-value {
-        font-size: 26px;
+        font-size: clamp(18px,2vw,26px);
         font-weight: 700;
         color: #1a1a2e;
         margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
+
+    .stat-card .d-flex {
+        height: 100%;
+    }
+
 
     .stat-sub {
         color: #bbb;
         font-size: 11px;
     }
 
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
+    .stat-icon{
+    width:55px;
+    height:55px;
+    border-radius:12px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-shrink:0;
+    font-size:20px;
+}
+    
 </style>
 
 <!-- ===== CHART.JS ===== -->
