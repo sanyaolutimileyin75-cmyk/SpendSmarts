@@ -1,5 +1,5 @@
 # ===== STAGE 1: Build the app =====
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
 WORKDIR /app
 
 # Copy the csproj from the subfolder
@@ -12,7 +12,7 @@ WORKDIR /app/SpendSmart2
 RUN dotnet publish -c Release -o /app/out
 
 # ===== STAGE 2: Run the app =====
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
 
