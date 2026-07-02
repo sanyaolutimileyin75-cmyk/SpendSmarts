@@ -2,19 +2,18 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy project file and restore dependencies
-COPY *.csproj ./
-RUN dotnet restore
+# Copy the csproj from the subfolder
+COPY SpendSmart2/*.csproj ./SpendSmart2/
+RUN dotnet restore SpendSmart2/SpendSmart2.csproj
 
-# Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o out
+# Copy everything else
+COPY SpendSmart2/. ./SpendSmart2/
+WORKDIR /app/SpendSmart2
+RUN dotnet publish -c Release -o /app/out
 
 # ===== STAGE 2: Run the app =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-
-# Copy the built app from Stage 1
 COPY --from=build /app/out .
 
 # Expose port 8080 (Render uses this)
