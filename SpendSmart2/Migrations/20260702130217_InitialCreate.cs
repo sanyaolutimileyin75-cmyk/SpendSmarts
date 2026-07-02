@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -15,11 +16,11 @@ namespace SpendSmart2.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FullName = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,13 +31,13 @@ namespace SpendSmart2.Migrations
                 name: "Expenses",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Category = table.Column<string>(type: "text", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

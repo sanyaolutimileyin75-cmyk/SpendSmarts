@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MVC
 builder.Services.AddControllersWithViews();
 
-// Add DbContext
+// Add DbContext with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration
+    options.UseNpgsql(builder.Configuration
     .GetConnectionString("DefaultConnection")));
 
 // Add Cookie Authentication
@@ -25,6 +25,24 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+// ✅ AUTO MIGRATION
+// This automatically creates/updates the database
+// when the app starts on Render
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate(); // ✅ Runs migrations automatically
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
+}
 
 if (!app.Environment.IsDevelopment())
 {
