@@ -34,24 +34,22 @@ namespace SpendSmart2.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Find user by email only
             var user = _context.Users
                 .FirstOrDefault(u => u.Email == model.Email);
 
-            // Verify password using BCrypt
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
             {
                 ModelState.AddModelError("", "Invalid email or password");
                 return View(model);
             }
 
-            // Create claims
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.FullName!),
-                new Claim(ClaimTypes.Email, user.Email!)
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.FullName!),
+        new Claim(ClaimTypes.Email, user.Email!),
+        new Claim("ProfilePicture", user.ProfilePicture ?? "")
+    };
 
             var identity = new ClaimsIdentity(claims,
                 CookieAuthenticationDefaults.AuthenticationScheme);
@@ -64,6 +62,7 @@ namespace SpendSmart2.Controllers
 
             return RedirectToAction("Index", "Dashboard");
         }
+
 
         // GET: /Auth/Register
         public IActionResult Register()
@@ -134,7 +133,7 @@ namespace SpendSmart2.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Profile(User model, string? NewPassword)
+        public async Task<IActionResult> Profile(User model, string? NewPassword, IFormFile? ProfileImage)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var user = _context.Users.FirstOrDefault(u => u.Id == userId);
@@ -151,10 +150,41 @@ namespace SpendSmart2.Controllers
                 user.Password = BCrypt.Net.BCrypt.HashPassword(NewPassword);
             }
 
+            // ✅ Handle profile image upload
+            if (ProfileImage != null && ProfileImage.Length > 0)
+            {
+                // Validate file size (max 2MB)
+                if (ProfileImage.Length > 2 * 1024 * 1024)
+                {
+                    TempData["Error"] = "Image size must be less than 2MB";
+                    return RedirectToAction("Profile");
+                }
+
+                // Validate file type
+                var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif" };
+                if (!allowedTypes.Contains(ProfileImage.ContentType.ToLower()))
+                {
+                    TempData["Error"] = "Only JPG, PNG, and GIF images are allowed";
+                    return RedirectToAction("Profile");
+                }
+
+                // Convert image to Base64 (stored in database)
+                using (var ms = new MemoryStream())
+                {
+                    await ProfileImage.CopyToAsync(ms);
+                    var fileBytes = ms.ToArray();
+                    var base64 = Convert.ToBase64String(fileBytes);
+                    user.ProfilePicture = $"data:{ProfileImage.ContentType};base64,{base64}";
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Profile updated successfully!";
             return RedirectToAction("Profile");
+
+
+
         }
     }
-}
+}    

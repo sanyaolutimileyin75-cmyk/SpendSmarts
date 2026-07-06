@@ -7,15 +7,29 @@
 <div class="row justify-content-center">
     <div class="col-md-7">
 
+        @* ✅ Success Message *@
         @if (TempData["Success"] != null)
         {
             <div class="alert mb-4"
                  style="background:rgba(6,214,160,0.15);
-                        border:1px solid rgba(6,214,160,0.3);
-                        color:#06d6a0;
-                        border-radius:10px">
+                border:1px solid rgba(6,214,160,0.3);
+                color:#06d6a0;
+                border-radius:10px">
                 <i class="fas fa-check-circle me-2"></i>
                 @TempData["Success"]
+            </div>
+        }
+
+        @* ✅ Error Message *@
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert mb-4"
+                 style="background:rgba(255,99,99,0.15);
+                border:1px solid rgba(255,99,99,0.3);
+                color:#ff6363;
+                border-radius:10px">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                @TempData["Error"]
             </div>
         }
 
@@ -28,25 +42,44 @@
             </div>
             <div class="card-body p-4">
 
-                <!-- Avatar -->
+                <!-- ✅ Avatar / Profile Photo Section -->
                 <div class="text-center mb-4">
-                    <div class="mx-auto mb-3"
-                         style="width:80px; height:80px;
-                                background:linear-gradient(135deg,#4cc9f0,#4361ee);
-                                border-radius:50%;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-                                font-size:32px;
-                                color:#fff;
-                                font-weight:700">
-                        @Model.FullName?.Substring(0, 1).ToUpper()
-                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                    {
+                        <!-- ✅ Show Base64 Profile Picture -->
+                        <img src="@Model.ProfilePicture"
+                             alt="Profile Photo"
+                             style="width:80px; height:80px;
+                        border-radius:50%;
+                        object-fit:cover;
+                        border:3px solid #4cc9f0;
+                        margin-bottom:10px;" />
+                    }
+                    else
+                    {
+                        <!-- ✅ Show Default Letter Avatar if no photo -->
+                        <div class="mx-auto mb-3"
+                             style="width:80px; height:80px;
+                            background:linear-gradient(135deg,#4cc9f0,#4361ee);
+                            border-radius:50%;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            font-size:32px;
+                            color:#fff;
+                            font-weight:700">
+                            @Model.FullName?.Substring(0, 1).ToUpper()
+                        </div>
+                    }
+
                     <h5 style="color:#1a1a2e; font-weight:600">@Model.FullName</h5>
                     <p style="color:#999; font-size:13px">@Model.Email</p>
                 </div>
 
-                <form asp-action="Profile" asp-controller="Auth" method="post">
+                <!-- ✅ Form with enctype for file upload -->
+                <form asp-action="Profile" asp-controller="Auth"
+                      method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
                     <div class="mb-3">
@@ -73,7 +106,7 @@
                         </small>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label class="form-label fw-500">
                             <i class="fas fa-lock me-2" style="color:#4cc9f0"></i>
                             New Password
@@ -87,18 +120,87 @@
                                placeholder="Enter new password" />
                     </div>
 
+                    <!-- ✅ NEW: Profile Photo Upload Field -->
+                    <div class="mb-4">
+                        <label class="form-label fw-500">
+                            <i class="fas fa-camera me-2" style="color:#4cc9f0"></i>
+                            Profile Photo
+                            <small style="color:#bbb; font-size:11px">
+                                (JPG, PNG - Max 2MB)
+                            </small>
+                        </label>
+                        <input type="file"
+                               name="ProfileImage"
+                               id="ProfileImage"
+                               class="form-control"
+                               accept="image/*"
+                               onchange="previewImage(event)" />
+
+                        <!-- ✅ Image Preview Before Saving -->
+                        <div class="text-center mt-3"
+                             id="previewContainer"
+                             style="display:none;">
+                            <p style="color:#999; font-size:12px">
+                                Preview:
+                            </p>
+                            <img id="imagePreview"
+                                 src="#"
+                                 alt="Preview"
+                                 style="width:80px; height:80px;
+                            border-radius:50%;
+                            object-fit:cover;
+                            border:3px solid #4cc9f0;" />
+                        </div>
+                    </div>
+
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-2"></i>Save Changes
                         </button>
                         <a href="/Dashboard/Index"
-                           class="btn btn-secondary"
-                           style="border-radius:10px">
+                               class="btn btn-secondary"
+                               style="border-radius:10px">
                             <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
+
+<!-- ✅ JavaScript for Image Preview & Validation -->
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            var file = event.target.files[0];
+
+            if (file) {
+                // ✅ Check file size (max 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert("File is too large! Please upload an image under 2MB.");
+                    event.target.value = "";
+                    document.getElementById("previewContainer").style.display = "none";
+                    return;
+                }
+
+                // ✅ Check file type
+                if (!file.type.startsWith("image/")) {
+                    alert("Please upload a valid image file (JPG, PNG).");
+                    event.target.value = "";
+                    document.getElementById("previewContainer").style.display = "none";
+                    return;
+                }
+
+                // ✅ Show preview
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("imagePreview").src = e.target.result;
+                    document.getElementById("previewContainer").style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+}

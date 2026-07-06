@@ -15,5 +15,8 @@ namespace SpendSmart2.Models
 
         [Required]
         public string? Password { get; set; }
+
+        // ✅ New field for profile picture
+        public string? ProfilePicture { get; set; }
     }
 }
