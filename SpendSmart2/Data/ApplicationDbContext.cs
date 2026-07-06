@@ -17,11 +17,9 @@ namespace SpendSmart2.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Fix decimal precision warning
             modelBuilder.Entity<Expense>()
                 .Property(e => e.Amount)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("numeric(18,2)");
         }
     }
 }
-

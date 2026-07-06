@@ -70,7 +70,8 @@ namespace SpendSmart2.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             model.UserId = userId;
-            model.Date = DateTime.Now;
+            model.Date = DateTime.UtcNow; // ✅ Fix for PostgreSQL
+
             ModelState.Remove("User");
 
             if (!ModelState.IsValid)
@@ -103,6 +104,7 @@ namespace SpendSmart2.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             model.UserId = userId;
+
             ModelState.Remove("User");
 
             if (!ModelState.IsValid)
@@ -117,12 +119,14 @@ namespace SpendSmart2.Controllers
             expense.Name = model.Name;
             expense.Category = model.Category;
             expense.Amount = model.Amount;
-            expense.Date = model.Date;
+            // ✅ Convert to UTC for PostgreSQL
+            expense.Date = DateTime.SpecifyKind(model.Date, DateTimeKind.Utc);
 
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
+
 
         // POST: /Expense/Delete/5
         [HttpPost]

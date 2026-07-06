@@ -1,5 +1,4 @@
-﻿using SpendSmart2.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SpendSmart2.Models
 {
@@ -14,13 +13,12 @@ namespace SpendSmart2.Models
         public string? Category { get; set; }
 
         [Required]
-        [Range(1, 1000000)]
+        [Range(1, 1000000000)]
         public decimal Amount { get; set; }
 
-        public DateTime Date { get; set; } = DateTime.Now;
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
         public int UserId { get; set; }
         public User? User { get; set; }
     }
-}    
-
+}

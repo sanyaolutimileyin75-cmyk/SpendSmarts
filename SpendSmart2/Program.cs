@@ -2,15 +2,27 @@ using Microsoft.EntityFrameworkCore;
 using SpendSmart2.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+// ✅ Enable legacy timestamp behavior for PostgreSQL
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MVC
 builder.Services.AddControllersWithViews();
 
 // Add DbContext with PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Auto-convert URL format to Npgsql format if needed
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+{
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration
-    .GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Add Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -19,7 +31,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Auth/Login";
         options.LogoutPath = "/Auth/Logout";
         options.AccessDeniedPath = "/Auth/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
     });
 
 builder.Services.AddHttpContextAccessor();
@@ -27,15 +40,13 @@ builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // ✅ AUTO MIGRATION
-// This automatically creates/updates the database
-// when the app starts on Render
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate(); // ✅ Runs migrations automatically
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {
@@ -54,11 +65,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// ⚠️ ORDER MATTERS - must be in this order
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Default route goes to Login first
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
