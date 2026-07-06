@@ -14,7 +14,7 @@
                 <div>
                     <p class="stat-label">Total Expenses</p>
                     <h3 class="stat-value">
-                        ₦@CurrencyHelper.FormatCurrency((decimal)ViewBag.TotalExpenses)
+                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.TotalExpenses)
                     </h3>
                     <span class="stat-sub d-none d-md-inline">All time spending</span>
                 </div>
@@ -31,7 +31,7 @@
                 <div>
                     <p class="stat-label">This Month</p>
                     <h3 class="stat-value">
-                        ₦@CurrencyHelper.FormatCurrency((decimal)ViewBag.ThisMonthTotal)
+                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.ThisMonthTotal)
                     </h3>
                     <span class="stat-sub d-none d-md-inline">@DateTime.Now.ToString("MMMM yyyy")</span>
                 </div>
@@ -63,7 +63,7 @@
                 <div>
                     <p class="stat-label">Highest Expense</p>
                     <h3 class="stat-value">
-                        ₦@CurrencyHelper.FormatCurrency((decimal)ViewBag.HighestExpense)
+                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.HighestExpense)
                     </h3>
                     <span class="stat-sub d-none d-md-inline">Single transaction</span>
                 </div>
@@ -149,7 +149,7 @@
                                 </td>
                                 <td>
                                     <strong style="color:#4361ee">
-                                        ₦@CurrencyHelper.FormatCurrency((decimal)expense.Amount)
+                                        @CurrencyHelper.FormatCurrency((decimal)expense.Amount)
                                     </strong>
                                 </td>
                                 <td style="color:#999">
