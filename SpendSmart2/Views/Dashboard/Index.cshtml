@@ -6,34 +6,34 @@
 }
 
 <!-- ===== STATS CARDS ===== -->
-<div class="row g-4 mb-4">
+<div class="row g-3 g-md-4 mb-4">
 
-    <div class="col-xl-3 col-md-6 d-flex">
+    <div class="col-6 col-xl-3">
         <div class="stat-card w-100">
-            <div class="d-flex justify-content-between align-items-center h-100">
+            <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">Total Expenses</p>
                     <h3 class="stat-value">
-                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.TotalExpenses)
+                        ₦@CurrencyHelper.FormatCurrency((decimal)ViewBag.TotalExpenses)
                     </h3>
-                    <span class="stat-sub">All time spending</span>
+                    <span class="stat-sub d-none d-md-inline">All time spending</span>
                 </div>
                 <div class="stat-icon" style="background:rgba(76,201,240,0.15)">
                     <i class="fas fa-wallet" style="color:#4cc9f0"></i>
-                </div> 
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6 d-flex">
+    <div class="col-6 col-xl-3">
         <div class="stat-card w-100">
-            <div class="d-flex justify-content-between align-items-center h-100">
+            <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">This Month</p>
                     <h3 class="stat-value">
-                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.ThisMonthTotal)
+                        ₦@CurrencyHelper.FormatCurrency((decimal)ViewBag.ThisMonthTotal)
                     </h3>
-                    <span class="stat-sub">@DateTime.Now.ToString("MMMM yyyy")</span>
+                    <span class="stat-sub d-none d-md-inline">@DateTime.Now.ToString("MMMM yyyy")</span>
                 </div>
                 <div class="stat-icon" style="background:rgba(67,97,238,0.15)">
                     <i class="fas fa-calendar-alt" style="color:#4361ee"></i>
@@ -42,13 +42,13 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6 d-flex">
+    <div class="col-6 col-xl-3">
         <div class="stat-card w-100">
-            <div class="d-flex justify-content-between align-items-center h-100">
+            <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">Transactions</p>
                     <h3 class="stat-value">@ViewBag.ExpenseCount</h3>
-                    <span class="stat-sub">Total records</span>
+                    <span class="stat-sub d-none d-md-inline">Total records</span>
                 </div>
                 <div class="stat-icon" style="background:rgba(76,201,240,0.15)">
                     <i class="fas fa-receipt" style="color:#4cc9f0"></i>
@@ -57,15 +57,15 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6 d-flex">
+    <div class="col-6 col-xl-3">
         <div class="stat-card w-100">
-            <div class="d-flex justify-content-between align-items-center h-100">
+            <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">Highest Expense</p>
                     <h3 class="stat-value">
-                        @CurrencyHelper.FormatCurrency((decimal)ViewBag.HighestExpense)
+                        ₦@CurrencyHelper.FormatCurrency((decimal)ViewBag.HighestExpense)
                     </h3>
-                    <span class="stat-sub">Single transaction</span>
+                    <span class="stat-sub d-none d-md-inline">Single transaction</span>
                 </div>
                 <div class="stat-icon" style="background:rgba(255,107,107,0.15)">
                     <i class="fas fa-arrow-up" style="color:#ff6b6b"></i>
@@ -77,10 +77,10 @@
 </div>
 
 <!-- ===== CHARTS ROW ===== -->
-<div class="row g-4 mb-4">
+<div class="row g-3 g-md-4 mb-4">
 
     <!-- Monthly Chart -->
-    <div class="col-lg-8">
+    <div class="col-12 col-lg-8">
         <div class="card h-100">
             <div class="card-header">
                 <h5>
@@ -95,7 +95,7 @@
     </div>
 
     <!-- Category Chart -->
-    <div class="col-lg-4">
+    <div class="col-12 col-lg-4">
         <div class="card h-100">
             <div class="card-header">
                 <h5>
@@ -113,7 +113,7 @@
 
 <!-- ===== RECENT EXPENSES ===== -->
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5>
             <i class="fas fa-clock me-2" style="color:#4cc9f0"></i>
             Recent Expenses
@@ -149,7 +149,7 @@
                                 </td>
                                 <td>
                                     <strong style="color:#4361ee">
-                                        ₦@string.Format("{0:N2}", expense.Amount)
+                                        ₦@CurrencyHelper.FormatCurrency((decimal)expense.Amount)
                                     </strong>
                                 </td>
                                 <td style="color:#999">
@@ -174,17 +174,15 @@
     </div>
 </div>
 
-<!-- ===== EXTRA STYLES ===== -->
+<!-- ===== STYLES ===== -->
 <style>
     .stat-card {
         background: #fff;
         border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 5px 15px rgba(0,0,0,.08);
-        transition: .3s ease;
-        min-height: 170px;
-        display: flex;
-        align-items: center;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+        height: 100%;
     }
 
     .stat-card:hover {
@@ -201,36 +199,57 @@
     }
 
     .stat-value {
-        font-size: clamp(18px,2vw,26px);
+        font-size: 24px;
         font-weight: 700;
         color: #1a1a2e;
         margin: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        line-height: 1.2;
     }
-
-    .stat-card .d-flex {
-        height: 100%;
-    }
-
 
     .stat-sub {
         color: #bbb;
         font-size: 11px;
     }
 
-    .stat-icon{
-    width:55px;
-    height:55px;
-    border-radius:12px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-shrink:0;
-    font-size:20px;
-}
-    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    /* Tablet */
+    @@media (max-width: 991px) {
+        .stat-card {
+            padding: 18px;
+        }
+        .stat-value {
+            font-size: 20px;
+        }
+    }
+
+    /* Mobile */
+    @@media (max-width: 576px) {
+        .stat-card {
+            padding: 15px;
+        }
+        .stat-value {
+            font-size: 18px;
+        }
+        .stat-label {
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+        }
+    }
 </style>
 
 <!-- ===== CHART.JS ===== -->
@@ -241,12 +260,22 @@
         const monthLabels = @Html.Raw(ViewBag.MonthLabels);
         const monthlyTotals = @Html.Raw(ViewBag.MonthlyTotals);
 
+        // Helper function to format numbers on chart
+        function formatChartCurrency(value) {
+            if (value >= 1000000) {
+                return '₦' + (value / 1000000).toFixed(1) + 'M';
+            } else if (value >= 1000) {
+                return '₦' + (value / 1000).toFixed(1) + 'K';
+            }
+            return '₦' + value.toLocaleString();
+        }
+
         new Chart(document.getElementById('monthlyChart'), {
             type: 'bar',
             data: {
                 labels: monthLabels,
                 datasets: [{
-                    label: 'Total Spending (₦)',
+                    label: 'Total Spending',
                     data: monthlyTotals,
                     backgroundColor: 'rgba(76, 201, 240, 0.2)',
                     borderColor: '#4cc9f0',
@@ -257,8 +286,16 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: true,
                 plugins: {
-                    legend: { display: false }
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return formatChartCurrency(context.parsed.y);
+                            }
+                        }
+                    }
                 },
                 scales: {
                     y: {
@@ -266,7 +303,7 @@
                         grid: { color: 'rgba(0,0,0,0.05)' },
                         ticks: {
                             callback: function(value) {
-                                return '₦' + value.toLocaleString();
+                                return formatChartCurrency(value);
                             }
                         }
                     },
@@ -298,6 +335,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: true,
                 cutout: '70%',
                 plugins: {
                     legend: {
@@ -305,6 +343,13 @@
                         labels: {
                             padding: 15,
                             font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + formatChartCurrency(context.parsed);
+                            }
                         }
                     }
                 }
