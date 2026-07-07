@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SpendSmart2.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection; // ✅ ADD THIS
 
 // ✅ Enable legacy timestamp behavior for PostgreSQL
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -9,6 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add MVC
 builder.Services.AddControllersWithViews();
+
+// ✅ ADD THIS: Persist Data Protection Keys
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
+    .SetApplicationName("SpendSmart2");
 
 // Add DbContext with PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -39,7 +45,7 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// ✅ AUTO MIGRATION
+// AUTO MIGRATION
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
