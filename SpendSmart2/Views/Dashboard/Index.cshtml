@@ -5,11 +5,12 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<!-- ===== STATS CARDS ===== -->
+<!-- ===== STATS CARDS (NOW CLICKABLE) ===== -->
 <div class="row g-3 g-md-4 mb-4">
 
+    <!-- ✅ Total Expenses - Clickable -->
     <div class="col-6 col-xl-3">
-        <div class="stat-card w-100">
+        <div class="stat-card w-100 clickable-card" onclick="openModal('totalExpensesModal')">
             <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">Total Expenses</p>
@@ -25,8 +26,9 @@
         </div>
     </div>
 
+    <!-- ✅ This Month - Clickable -->
     <div class="col-6 col-xl-3">
-        <div class="stat-card w-100">
+        <div class="stat-card w-100 clickable-card" onclick="openModal('thisMonthModal')">
             <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">This Month</p>
@@ -42,8 +44,9 @@
         </div>
     </div>
 
+    <!-- ✅ Transactions - Clickable -->
     <div class="col-6 col-xl-3">
-        <div class="stat-card w-100">
+        <div class="stat-card w-100 clickable-card" onclick="openModal('transactionsModal')">
             <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">Transactions</p>
@@ -57,8 +60,9 @@
         </div>
     </div>
 
+    <!-- ✅ Highest Expense - Clickable -->
     <div class="col-6 col-xl-3">
-        <div class="stat-card w-100">
+        <div class="stat-card w-100 clickable-card" onclick="openModal('highestExpenseModal')">
             <div class="d-flex justify-content-between align-items-start h-100">
                 <div>
                     <p class="stat-label">Highest Expense</p>
@@ -79,7 +83,6 @@
 <!-- ===== CHARTS ROW ===== -->
 <div class="row g-3 g-md-4 mb-4">
 
-    <!-- Monthly Chart -->
     <div class="col-12 col-lg-8">
         <div class="card h-100">
             <div class="card-header">
@@ -94,7 +97,6 @@
         </div>
     </div>
 
-    <!-- Category Chart -->
     <div class="col-12 col-lg-4">
         <div class="card h-100">
             <div class="card-header">
@@ -174,6 +176,232 @@
     </div>
 </div>
 
+
+<!-- ============================================ -->
+<!-- ✅ MODAL 1: TOTAL EXPENSES (By Category)      -->
+<!-- ============================================ -->
+<div id="totalExpensesModal" class="custom-modal" onclick="closeModalOnOverlay(event, 'totalExpensesModal')">
+    <div class="custom-modal-content" onclick="event.stopPropagation()">
+        <div class="custom-modal-header" style="background:linear-gradient(135deg,#4cc9f0,#4361ee)">
+            <div>
+                <h4><i class="fas fa-wallet me-2"></i>Total Expenses</h4>
+                <p class="mb-0" style="opacity:0.9; font-size:14px">
+                    @CurrencyHelper.FormatCurrency((decimal)ViewBag.TotalExpenses) across @ViewBag.ExpenseCount transactions
+                </p>
+            </div>
+            <span class="close-btn" onclick="closeModal('totalExpensesModal')">&times;</span>
+        </div>
+        <div class="custom-modal-body">
+            @if (ViewBag.ExpensesByCategory != null && ViewBag.ExpensesByCategory.Count > 0)
+            {
+                <h6 class="mb-3" style="color:#666">Breakdown by Category</h6>
+                @foreach (var cat in ViewBag.ExpensesByCategory)
+                {
+                    var percent = ((decimal)cat.Total / (decimal)ViewBag.TotalExpenses) * 100;
+                    <div class="category-item">
+                        <div class="d-flex justify-content-between mb-1">
+                            <strong>@cat.Category</strong>
+                            <span style="color:#4361ee; font-weight:600">
+                                @CurrencyHelper.FormatCurrency((decimal)cat.Total)
+                            </span>
+                        </div>
+                        <div class="progress" style="height:8px; border-radius:5px">
+                            <div class="progress-bar" 
+                                 style="width:@percent.ToString("F0")%; background:linear-gradient(90deg,#4cc9f0,#4361ee)">
+                            </div>
+                        </div>
+                        <small style="color:#999">
+                            @cat.Count transaction@(cat.Count > 1 ? "s" : "") • @percent.ToString("F1")%
+                        </small>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x mb-3" style="color:#ddd"></i>
+                    <p style="color:#999">No expenses to display</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- ✅ MODAL 2: THIS MONTH                        -->
+<!-- ============================================ -->
+<div id="thisMonthModal" class="custom-modal" onclick="closeModalOnOverlay(event, 'thisMonthModal')">
+    <div class="custom-modal-content" onclick="event.stopPropagation()">
+        <div class="custom-modal-header" style="background:linear-gradient(135deg,#4361ee,#3a0ca3)">
+            <div>
+                <h4><i class="fas fa-calendar-alt me-2"></i>@DateTime.Now.ToString("MMMM yyyy")</h4>
+                <p class="mb-0" style="opacity:0.9; font-size:14px">
+                    Total: @CurrencyHelper.FormatCurrency((decimal)ViewBag.ThisMonthTotal)
+                </p>
+            </div>
+            <span class="close-btn" onclick="closeModal('thisMonthModal')">&times;</span>
+        </div>
+        <div class="custom-modal-body">
+            @if (ViewBag.ThisMonthExpenses != null && ViewBag.ThisMonthExpenses.Count > 0)
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var expense in ViewBag.ThisMonthExpenses)
+                        {
+                            <tr>
+                                <td><strong>@expense.Name</strong></td>
+                                <td>
+                                    <span class="badge-category" 
+                                          style="background:rgba(67,97,238,0.15); color:#4361ee">
+                                        @expense.Category
+                                    </span>
+                                </td>
+                                <td><strong style="color:#4361ee">@CurrencyHelper.FormatCurrency((decimal)expense.Amount)</strong></td>
+                                <td style="color:#999">@expense.Date.ToString("MMM dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-times fa-3x mb-3" style="color:#ddd"></i>
+                    <p style="color:#999">No expenses this month yet</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- ✅ MODAL 3: ALL TRANSACTIONS                  -->
+<!-- ============================================ -->
+<div id="transactionsModal" class="custom-modal" onclick="closeModalOnOverlay(event, 'transactionsModal')">
+    <div class="custom-modal-content" onclick="event.stopPropagation()">
+        <div class="custom-modal-header" style="background:linear-gradient(135deg,#4cc9f0,#118ab2)">
+            <div>
+                <h4><i class="fas fa-receipt me-2"></i>All Transactions</h4>
+                <p class="mb-0" style="opacity:0.9; font-size:14px">
+                    @ViewBag.ExpenseCount total record@(ViewBag.ExpenseCount != 1 ? "s" : "")
+                </p>
+            </div>
+            <span class="close-btn" onclick="closeModal('transactionsModal')">&times;</span>
+        </div>
+        <div class="custom-modal-body">
+            @if (ViewBag.AllExpenses != null && ViewBag.AllExpenses.Count > 0)
+            {
+                <div class="mb-3">
+                    <input type="text" 
+                           id="transactionSearch" 
+                           class="form-control" 
+                           placeholder="🔍 Search transactions..."
+                           onkeyup="searchTransactions()" />
+                </div>
+                <table class="table table-hover" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var expense in ViewBag.AllExpenses)
+                        {
+                            <tr>
+                                <td><strong>@expense.Name</strong></td>
+                                <td>
+                                    <span class="badge-category" 
+                                          style="background:rgba(76,201,240,0.15); color:#4cc9f0">
+                                        @expense.Category
+                                    </span>
+                                </td>
+                                <td><strong style="color:#4361ee">@CurrencyHelper.FormatCurrency((decimal)expense.Amount)</strong></td>
+                                <td style="color:#999">@expense.Date.ToString("MMM dd, yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x mb-3" style="color:#ddd"></i>
+                    <p style="color:#999">No transactions yet</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- ✅ MODAL 4: HIGHEST EXPENSE                   -->
+<!-- ============================================ -->
+<div id="highestExpenseModal" class="custom-modal" onclick="closeModalOnOverlay(event, 'highestExpenseModal')">
+    <div class="custom-modal-content" onclick="event.stopPropagation()">
+        <div class="custom-modal-header" style="background:linear-gradient(135deg,#ff6b6b,#f72585)">
+            <div>
+                <h4><i class="fas fa-arrow-up me-2"></i>Highest Expense</h4>
+                <p class="mb-0" style="opacity:0.9; font-size:14px">
+                    Your biggest single transaction
+                </p>
+            </div>
+            <span class="close-btn" onclick="closeModal('highestExpenseModal')">&times;</span>
+        </div>
+        <div class="custom-modal-body">
+            @if (ViewBag.HighestExpenseDetail != null)
+            {
+                var highest = ViewBag.HighestExpenseDetail;
+                <div class="text-center mb-4">
+                    <div style="font-size:48px; color:#ff6b6b; font-weight:700">
+                        @CurrencyHelper.FormatCurrency((decimal)highest.Amount)
+                    </div>
+                    <p style="color:#999">Single Transaction</p>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-tag me-2"></i>Name</span>
+                    <span class="detail-value">@highest.Name</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-folder me-2"></i>Category</span>
+                    <span class="badge-category" style="background:rgba(255,107,107,0.15); color:#ff6b6b">
+                        @highest.Category
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-calendar me-2"></i>Date</span>
+                    <span class="detail-value">@highest.Date.ToString("dddd, MMMM dd, yyyy")</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-percentage me-2"></i>% of Total</span>
+                    <span class="detail-value">
+                        @(((decimal)highest.Amount / (decimal)ViewBag.TotalExpenses * 100).ToString("F1"))%
+                    </span>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x mb-3" style="color:#ddd"></i>
+                    <p style="color:#999">No expenses yet</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
 <!-- ===== STYLES ===== -->
 <style>
     .stat-card {
@@ -181,12 +409,21 @@
         border-radius: 15px;
         padding: 20px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         height: 100%;
     }
 
     .stat-card:hover {
         transform: translateY(-3px);
+    }
+
+    /* ✅ Clickable card style */
+    .clickable-card {
+        cursor: pointer;
+    }
+
+    .clickable-card:hover {
+        box-shadow: 0 8px 25px rgba(76,201,240,0.25);
     }
 
     .stat-label {
@@ -222,51 +459,177 @@
         flex-shrink: 0;
     }
 
+    /* ===== CUSTOM MODAL STYLES ===== */
+    .custom-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+        padding: 20px;
+    }
+
+    .custom-modal.show {
+        display: flex;
+    }
+
+    .custom-modal-content {
+        background: #fff;
+        border-radius: 20px;
+        max-width: 700px;
+        width: 100%;
+        max-height: 85vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: zoomIn 0.3s ease;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .custom-modal-header {
+        padding: 20px 25px;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .custom-modal-header h4 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .close-btn {
+        font-size: 30px;
+        cursor: pointer;
+        color: #fff;
+        line-height: 1;
+        padding: 0 5px;
+        transition: transform 0.2s;
+    }
+
+    .close-btn:hover {
+        transform: scale(1.2);
+    }
+
+    .custom-modal-body {
+        padding: 25px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .category-item {
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: #999;
+        font-size: 14px;
+    }
+
+    .detail-value {
+        color: #1a1a2e;
+        font-weight: 600;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @@keyframes zoomIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
     /* Tablet */
     @@media (max-width: 991px) {
-        .stat-card {
-            padding: 18px;
-        }
-        .stat-value {
-            font-size: 20px;
-        }
+        .stat-card { padding: 18px; }
+        .stat-value { font-size: 20px; }
     }
 
     /* Mobile */
     @@media (max-width: 576px) {
-        .stat-card {
-            padding: 15px;
-        }
-        .stat-value {
-            font-size: 18px;
-        }
-        .stat-label {
-            font-size: 10px;
-            margin-bottom: 5px;
-        }
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-        }
+        .stat-card { padding: 15px; }
+        .stat-value { font-size: 18px; }
+        .stat-label { font-size: 10px; margin-bottom: 5px; }
+        .stat-icon { width: 40px; height: 40px; font-size: 16px; }
+        
+        .custom-modal-content { max-height: 90vh; border-radius: 15px; }
+        .custom-modal-header { padding: 15px 20px; }
+        .custom-modal-header h4 { font-size: 18px; }
+        .custom-modal-body { padding: 15px; }
     }
 </style>
 
-<!-- ===== CHART.JS ===== -->
+
+<!-- ===== SCRIPTS ===== -->
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // ===== MODAL FUNCTIONS =====
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnOverlay(event, modalId) {
+            if (event.target.id === modalId) {
+                closeModal(modalId);
+            }
+        }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.custom-modal.show').forEach(m => {
+                    m.classList.remove('show');
+                });
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // ===== SEARCH TRANSACTIONS =====
+        function searchTransactions() {
+            const input = document.getElementById('transactionSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#transactionsTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
         // ===== MONTHLY BAR CHART =====
         const monthLabels = @Html.Raw(ViewBag.MonthLabels);
         const monthlyTotals = @Html.Raw(ViewBag.MonthlyTotals);
 
-        // Helper function to format numbers on chart
         function formatChartCurrency(value) {
-            if (value >= 1000000) {
-                return '₦' + (value / 1000000).toFixed(1) + 'M';
-            } else if (value >= 1000) {
-                return '₦' + (value / 1000).toFixed(1) + 'K';
-            }
+            if (value >= 1000000) return '₦' + (value / 1000000).toFixed(1) + 'M';
+            if (value >= 1000) return '₦' + (value / 1000).toFixed(1) + 'K';
             return '₦' + value.toLocaleString();
         }
 
@@ -307,9 +670,7 @@
                             }
                         }
                     },
-                    x: {
-                        grid: { display: false }
-                    }
+                    x: { grid: { display: false } }
                 }
             }
         });
@@ -340,10 +701,7 @@
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: { size: 11 }
-                        }
+                        labels: { padding: 15, font: { size: 11 } }
                     },
                     tooltip: {
                         callbacks: {

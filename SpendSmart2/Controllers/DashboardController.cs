@@ -39,12 +39,41 @@ namespace SpendSmart2.Controllers
             ViewBag.HighestExpense = expenses.Any()
                 ? expenses.Max(e => e.Amount) : 0;
 
+            // ✅ NEW: Get the actual highest expense object (with all details)
+            ViewBag.HighestExpenseDetail = expenses.Any()
+                ? expenses.OrderByDescending(e => e.Amount).FirstOrDefault()
+                : null;
+
             // ===== THIS MONTH TOTAL =====
             var thisMonth = expenses
                 .Where(e => e.Date.Month == DateTime.Now.Month
                 && e.Date.Year == DateTime.Now.Year)
                 .Sum(e => e.Amount);
             ViewBag.ThisMonthTotal = thisMonth;
+
+            // ✅ NEW: Get this month's expenses list (for modal)
+            ViewBag.ThisMonthExpenses = expenses
+                .Where(e => e.Date.Month == DateTime.Now.Month
+                && e.Date.Year == DateTime.Now.Year)
+                .OrderByDescending(e => e.Date)
+                .ToList();
+
+            // ✅ NEW: All expenses (for Transactions modal)
+            ViewBag.AllExpenses = expenses
+                .OrderByDescending(e => e.Date)
+                .ToList();
+
+            // ✅ NEW: Group by category (for Total Expenses modal)
+            ViewBag.ExpensesByCategory = expenses
+                .GroupBy(e => e.Category)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    Total = g.Sum(e => e.Amount),
+                    Count = g.Count()
+                })
+                .OrderByDescending(x => x.Total)
+                .ToList();
 
             // ===== CATEGORY CHART DATA =====
             var categoryData = expenses
